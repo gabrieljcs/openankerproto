@@ -121,6 +121,8 @@ async function main() {
     chromePath,
     [
       "--headless=new",
+      // Linux Chrome gates Web Bluetooth behind experimental web features.
+      ...(process.platform === "linux" ? ["--enable-experimental-web-platform-features"] : []),
       "--disable-gpu",
       "--no-sandbox",
       "--no-first-run",
