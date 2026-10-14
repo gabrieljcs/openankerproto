@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>openankerproto · Your charging workspace</title>
+    <meta
+      name="description"
+      content="Free, open-source browser client for Anker BLE power banks and chargers. Connects directly over Web Bluetooth - no app, no account, no cloud."
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔌</text></svg>"
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to workspace</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <h1>
+          <span class="logo" aria-hidden="true">↯</span>
+          openankerproto
+        </h1>
+        <nav aria-label="Main navigation">
+          <a href="#about">About</a>
+          <button id="demo-btn" class="link-btn" type="button">Try demo</button>
+          <a href="https://github.com/" id="repo-link" hidden>Source</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap" id="main-content">
+      <section class="intro" aria-labelledby="intro-title">
+        <div>
+          <p class="eyebrow">DIRECT CONNECTION. COMPLETE CLARITY.</p>
+          <h2 id="intro-title">Your power.<br><span>At your fingertips.</span></h2>
+          <p class="intro-copy">A quieter home for your charging setup. See every port, follow the power, and fine-tune your device — directly from your browser.</p>
+          <a class="intro-action" href="#connect-card">Set up your workspace <span aria-hidden="true">↗</span></a>
+          <div class="trust-row"><span>↗ Direct Bluetooth</span><span>◉ No account</span><span>◇ Private by design</span></div>
+        </div>
+        <figure class="hero-instrument" aria-label="Illustration of a charging control panel">
+          <div class="instrument-top"><span>OPEN / POWER</span><span class="instrument-led">LOCAL LINK</span></div>
+          <div class="instrument-face">
+            <div class="instrument-screen"><span>YOUR CHARGING WORKSPACE</span><strong>Stay in charge<span>.</span></strong><div class="instrument-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small>DIRECT · PRIVATE · OPEN SOURCE</small></div>
+            <div class="instrument-dial" aria-hidden="true"><div></div><span>CONTROL</span></div>
+          </div>
+          <div class="instrument-bottom"><span>POWER BANKS / CHARGERS / STATIONS</span><span aria-hidden="true">＋</span></div>
+          <figcaption>A direct line to your devices.</figcaption>
+        </figure>
+      </section>
+      <div class="workspace-heading"><span class="eyebrow">YOUR WORKSPACE</span><span class="small muted">Local connection · No cloud required</span></div>
+      <nav class="workspace-nav" aria-label="Workspace sections"><a href="#status-card">Power overview</a><a href="#controls-card">Device settings</a><a href="#device-card">Device info</a><a href="#log-card">Diagnostics</a></nav>
+      <!--
+        Load-failure notice.
+
+        Opened straight from disk (`file://`), browsers block the ES module below
+        with a CORS error. The page still renders but every button is dead, which
+        is baffling unless the console happens to be open. This turns that silent
+        failure into an explanation with a fix.
+      -->
+      <section id="load-error" class="card notice notice-error" hidden>
+        <h2 id="load-error-title">This page needs to be served, not opened from disk</h2>
+        <p id="load-error-body"></p>
+        <ol class="small">
+          <li>Open a terminal in this folder.</li>
+          <li>Run <code>npm run serve</code></li>
+          <li>Open <code>http://127.0.0.1:8080/</code> in Chrome or Edge.</li>
+        </ol>
+        <p class="muted small">
+          Browsers refuse to load JavaScript modules over <code>file://</code> for security
+          reasons. This disables every button on the page, not just demo mode. The
+          same applies if you host the folder without also serving
+          <code>src/</code>.
+        </p>
+      </section>
+
+      <!-- Demo-mode banner, shown only while simulating -->
+      <section id="demo-banner" class="card notice notice-demo" hidden>
+        <div class="card-head">
+          <h2>Demo workspace · Simulated device</h2>
+          <button id="demo-exit" class="btn btn-sm" type="button">Back to home</button>
+        </div>
+        <div class="row demo-picker">
+          <label class="control-label" for="demo-model">Simulate a model</label>
+          <select id="demo-model" class="select"></select>
+          <span id="demo-model-note" class="muted small"></span>
+        </div>
+        <p class="muted small">Explore the dashboard with sample readings. No hardware is connected and no device settings are changed.</p>
+      </section>
+
+      <!-- Unsupported-browser notice, filled in by app.js -->
+      <section id="unsupported" class="card notice notice-error" hidden>
+        <h2>This browser can't talk to Bluetooth devices</h2>
+        <p id="unsupported-reason"></p>
+        <div class="support-grid">
+          <div class="support-item yes">
+            <strong>Chrome / Edge / Opera</strong>
+            <span>Desktop (Windows, macOS, Linux, ChromeOS) and Chrome on Android</span>
+          </div>
+          <div class="support-item no">
+            <strong>Safari &amp; Firefox</strong>
+            <span>Web Bluetooth is not implemented</span>
+          </div>
+          <div class="support-item no">
+            <strong>iPhone &amp; iPad</strong>
+            <span>Not supported by any browser, including Chrome</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="browser-warning" class="card notice" hidden>
+        <h2>Brave detected: use Google Chrome or Edge for Bluetooth</h2>
+        <p>Brave reports a Chrome-like browser identity but disables Web Bluetooth by default. If its picker is empty or blocked, open this same address in Google Chrome or Microsoft Edge. “Show all nearby devices” cannot override a browser restriction. Demo mode remains available.</p>
+      </section>
+
+      <!-- 1. Connect -->
+      <section class="card" id="connect-card">
+        <div class="card-head">
+          <h2>Connect your device</h2>
+          <span id="conn-badge" class="badge">disconnected</span>
+        </div>
+        <p class="muted">Power on or wake your Anker device and enable Bluetooth on your computer. Close the Anker app on your phone before connecting.</p>
+        <div class="connect-checklist"><span><b>01</b> Wake your device</span><span><b>02</b> Close the phone app</span><span><b>03</b> Choose your device</span></div>
+        <p id="demo-hint" class="muted small" hidden>
+          No device handy? <strong>Demo mode</strong> is on — press connect to explore the
+          interface with a simulated Anker Prime.
+        </p>
+        <div class="row">
+          <button id="connect-btn" class="btn btn-primary">Connect to a device</button>
+          <button id="disconnect-btn" class="btn" disabled>Disconnect</button>
+        </div>
+        <label class="scan-option"><input type="checkbox" id="scan-all" /> Show all nearby devices <span class="muted">— removes Anker name/service filters</span></label>
+        <p class="muted small">Choose the scan option before pressing Connect. It opens Chrome’s Bluetooth Low Energy picker; it cannot force Chrome to show every device from its internal diagnostic scan.</p>
+        <details class="connection-help">
+          <summary>Device not showing up?</summary>
+          <p>Use Chrome or Edge with Bluetooth enabled. Keep the device nearby, wake it, and disconnect the official phone app. Select <strong>Show all nearby devices</strong> before pressing Connect to remove this website’s name and service filters.</p>
+          <h3>Chrome on macOS: empty device picker</h3>
+          <ol>
+            <li>Open <strong>System Settings → Privacy &amp; Security → Bluetooth</strong>. If Google Chrome is listed, enable it.</li>
+            <li>If Chrome is missing from that list, or discovery still fails, paste <code>chrome://bluetooth-internals</code> into Chrome’s address bar.</li>
+            <li>Select <strong>Devices</strong>, then <strong>Start Scan</strong>. Allow Bluetooth access if macOS prompts you.</li>
+            <li>If you changed permissions, fully quit Chrome with <strong>⌘Q</strong> and reopen it. Return here, select <strong>Show all nearby devices</strong>, and try Connect again.</li>
+          </ol>
+          <p><strong>Chrome’s scan finds devices, but this picker stays empty?</strong> That confirms Chrome can scan, but does not confirm your Anker device is among those results. Stop the diagnostic scan and compare the device names with the picker. Look for Anker or your model number; names may differ or be absent. Report whether the picker is completely empty or just missing your device, and include any error from Connection diagnostics.</p>
+          <p>App-specific BLE devices may not appear in the system’s normal pairing list. This website uses Bluetooth, not Wi-Fi. A device appearing in the phone app does not confirm that your computer can discover it over Bluetooth.</p>
+          <p>Compatibility varies by model and firmware. Discovering a device does not guarantee protocol support. If the handshake fails after selecting a device, download Connection diagnostics below.</p>
+        </details>
+        <p id="connect-status" class="status" role="status" aria-live="polite"></p>
+        <button id="retry-status" class="btn" hidden>Retry reading device</button>
+      </section>
+
+      <!-- 3. Live status -->
+      <section class="card" id="status-card" hidden>
+        <div class="card-head">
+          <h2>Power overview</h2>
+          <label class="toggle">
+            <input type="checkbox" id="poll-toggle" />
+            <span>Auto-refresh · 3s</span>
+          </label>
+        </div>
+
+        <!-- Model-specific equipment panel: schematic of the product with its
+             reported connectors, drawn from the device's own data. -->
+        <div id="device-panel" class="device-panel"></div>
+        <p id="model-note" class="muted small model-note"></p>
+
+        <div class="stat-grid">
+          <div class="stat">
+            <span class="stat-label">Battery</span>
+            <span class="stat-value" id="stat-battery">—</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Temperature</span>
+            <span class="stat-value" id="stat-temp">—</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Total output</span>
+            <span class="stat-value" id="stat-out">—</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Total input</span>
+            <span class="stat-value" id="stat-in">—</span>
+          </div>
+        </div>
+
+        <details id="timeline-section" class="timeline-section">
+          <summary>Show telemetry timeline</summary>
+          <div class="timeline-toolbar">
+            <label>View <select id="timeline-metric" class="select"><option value="power">Total power</option><option value="ports">Per-port power</option><option value="voltages">Per-port voltage</option><option value="currents">Per-port current</option><option value="battery">Battery</option><option value="temperature">Temperature</option></select></label>
+            <label>History <select id="timeline-window" class="select"><option value="300000">Last 5 minutes</option><option value="900000">Last 15 minutes</option><option value="0">All retained readings</option></select></label>
+            <button id="timeline-clear" class="btn btn-sm" type="button">Clear history</button>
+          </div>
+          <p class="muted small">Enable auto-refresh to record a reading every 3 seconds. Up to 1,200 readings are kept for this connection.</p>
+          <p id="session-statistics" class="session-statistics" role="status"></p>
+          <div id="timeline-legend" class="timeline-legend"></div>
+          <div id="timeline-chart" class="timeline-chart"></div>
+          <p id="timeline-summary" class="muted small" role="status"></p>
+        </details>
+
+        <details class="readout-details"><summary>Detailed port measurements</summary>
+        <table class="ports">
+          <thead>
+            <tr><th>Port</th><th>Mode</th><th>Voltage</th><th>Current</th><th>Power</th></tr>
+          </thead>
+          <tbody id="ports-body">
+            <tr><td colspan="5" class="muted">No data yet.</td></tr>
+          </tbody>
+        </table>
+        </details>
+
+        <div class="row">
+          <button id="refresh-btn" class="btn">Refresh now</button>
+          <span id="poll-status" class="muted small" role="status">Paused</span>
+          <span id="last-updated" class="muted small"></span>
+        </div>
+      </section>
+
+      <!-- 2. Device -->
+      <section class="card" id="device-card" hidden>
+        <div class="card-head">
+          <h2>Device details</h2>
+          <span id="device-family" class="badge badge-muted"></span>
+        </div>
+        <dl class="kv">
+          <dt>Name</dt><dd id="dev-name">—</dd>
+          <dt>Serial number</dt><dd id="dev-serial">—</dd>
+          <dt>Bluetooth-reported version</dt><dd id="dev-firmware">—</dd>
+          <dt>Bluetooth MAC</dt><dd id="dev-mac">—</dd>
+        </dl>
+      </section>
+
+      <!-- 4. Controls -->
+      <section class="card" id="controls-card" hidden>
+        <h2>Device settings</h2>
+        <p id="settings-model-note" class="muted small" role="status"></p>
+        <button id="preview-charger-controls" class="btn btn-sm" hidden>Try A2345 charger controls in demo</button>
+        <div class="controls" id="generic-controls">
+          <div class="control">
+            <span class="control-label">Display theme</span>
+            <div class="row">
+              <button class="btn btn-sm" data-theme="simple">Simple</button>
+              <button class="btn btn-sm" data-theme="advanced">Advanced</button>
+            </div>
+          </div>
+          <div class="control">
+            <span class="control-label">Beeper</span>
+            <div class="row">
+              <button class="btn btn-sm" data-beep="on">On</button>
+              <button class="btn btn-sm" data-beep="off">Off</button>
+            </div>
+          </div>
+        </div>
+        <div id="charger-controls" hidden>
+          <p class="muted small">Brightness, Intelligent mode, knob direction, clock scheduling, and built-in clock styles have been tested on an A2345. Other controls remain experimental. Apply writes your selected setting to the charger.</p>
+          <div class="control"><label for="charger-brightness">Screen brightness (%)</label><div class="row"><input id="charger-brightness" type="number" min="0" max="100" value="50" class="select"><button class="btn btn-sm" data-charger-setting="brightness">Apply brightness</button></div></div>
+          <div class="control"><label for="charger-timeout">Screen timeout</label><div class="row"><select id="charger-timeout" class="select"><option value="0">Always on</option><option value="1">30 seconds</option><option value="2">1 minute</option><option value="3">5 minutes</option><option value="4">30 minutes</option></select><button class="btn btn-sm" data-charger-setting="timeout">Apply timeout</button></div></div>
+          <div class="control"><label for="charger-clockFormat">Clock format</label><div class="row"><select id="charger-clockFormat" class="select"><option value="0">12 hours</option><option value="1">24 hours</option></select><button class="btn btn-sm" data-charger-setting="clockFormat">Apply clock format</button></div></div>
+          <div class="control"><label for="charger-chargingMode">Charging mode</label><div class="row"><select id="charger-chargingMode" class="select"><option value="1">Intelligent</option><option value="2">Multi-port</option><option value="3">Dual laptop</option><option value="4">Night</option></select><button class="btn btn-sm" data-charger-setting="chargingMode">Apply mode</button></div><p class="muted small">Changes how the charger shares power.</p></div>
+          <div class="control"><label for="charger-rotation">Knob direction</label><div class="row"><select id="charger-rotation" class="select"><option value="0">Forward</option><option value="1">Reverse</option></select><button class="btn btn-sm" data-charger-setting="rotation">Apply direction</button></div></div>
+          <div class="control"><label for="charger-holiday">Holiday screensavers</label><div class="row"><select id="charger-holiday" class="select"><option value="0">Off</option><option value="1">On</option></select><button class="btn btn-sm" data-charger-setting="holiday">Apply screensavers</button></div></div>
+          <div class="control"><span class="control-label">Clock display schedule</span><div class="row"><label for="clock-start">From <input class="select" id="clock-start" type="time" value="08:00"></label><label for="clock-end">Until <input class="select" id="clock-end" type="time" value="23:00"></label></div><fieldset id="clock-days" class="clock-days"><legend>Repeat on</legend><label><input type="checkbox" data-clock-day="64" checked> Mon</label><label><input type="checkbox" data-clock-day="32" checked> Tue</label><label><input type="checkbox" data-clock-day="16" checked> Wed</label><label><input type="checkbox" data-clock-day="8" checked> Thu</label><label><input type="checkbox" data-clock-day="4" checked> Fri</label><label><input type="checkbox" data-clock-day="2" checked> Sat</label><label><input type="checkbox" data-clock-day="1" checked> Sun</label></fieldset><div class="row"><button class="btn btn-sm" data-clock-days="127">Every day</button><button class="btn btn-sm" data-clock-days="124">Weekdays</button><button class="btn btn-sm" data-clock-days="3">Weekends</button></div><button class="btn btn-sm" data-charger-setting="clockSchedule">Apply clock schedule</button><p class="muted small">Uses the charger's local clock. An end time before the start runs overnight.</p></div>
+          <fieldset class="priority-ports"><legend>USB-C port priority</legend><p class="muted small">Choose ports to prioritize when power is shared. Unchecked ports remain usable.</p><label><input type="checkbox" data-priority="1"> C1</label><label><input type="checkbox" data-priority="2"> C2</label><label><input type="checkbox" data-priority="4"> C3</label><label><input type="checkbox" data-priority="8"> C4</label><button class="btn btn-sm" data-charger-setting="priority">Apply priority</button></fieldset>
+
+          <div class="control"><span class="control-label">Clock time and time zone</span><p id="clock-local-time" class="muted small"></p><button id="sync-clock" class="btn btn-sm">Reconnect and sync clock</button><p id="clock-sync-result" class="muted small" role="status">Reconnects to the selected charger and sends the computer’s time and time-zone offset. Check your computer’s time zone before syncing. If the hour stays wrong, use Anker Power’s Wi-Fi setup to connect the charger to your network; some firmware relies on Wi-Fi time synchronization.</p></div><div class="control clock-theme-control"><span class="control-label">Clock screensaver</span><p class="muted small">The clock appears when the screen rests, during its display schedule. Choose a screen timeout such as 30 seconds: with “Always on”, the clock will not appear.</p><label for="clock-style">Style</label><select id="clock-style" class="select"><option value="0">Built-in style 1</option><option value="1">Built-in style 2</option><option value="2">Built-in style 3</option><option value="3">Image from URL</option></select><label class="row"><input id="clock-enabled" type="checkbox" checked> Show clock screensaver</label><div id="clock-image-fields" hidden><details class="photo-editor" open><summary>Prepare a photo · experimental</summary><p class="muted small">Choose a photo, crop it, and prepare a JPEG or PNG with its checksum. Charger image compatibility and output dimensions still need verification.</p><label for="photo-file">Photo</label><input id="photo-file" type="file" accept="image/jpeg,image/png,image/webp"><div class="row"><label for="photo-width">Width <input id="photo-width" class="select" type="number" min="16" max="1024" value="420" data-photo-option></label><label for="photo-height">Height <input id="photo-height" class="select" type="number" min="16" max="1024" value="175" data-photo-option></label></div><label for="photo-format">Output format</label><select id="photo-format" class="select" data-photo-option><option value="image/jpeg">JPEG</option><option value="image/png">PNG</option></select><label for="photo-fit">Fit</label><select id="photo-fit" class="select" data-photo-option><option value="cover">Fill screen (crop)</option><option value="contain">Fit whole photo</option></select><label for="photo-zoom">Zoom</label><input id="photo-zoom" type="range" min="1" max="4" step="0.05" value="1" data-photo-option><label for="photo-x">Horizontal position</label><input id="photo-x" type="range" min="0" max="100" value="50" data-photo-option><label for="photo-y">Vertical position</label><input id="photo-y" type="range" min="0" max="100" value="50" data-photo-option><div id="photo-preview-wrap" hidden><canvas id="photo-preview" aria-label="Prepared clock photo preview"></canvas></div><p id="photo-result" class="muted small" role="status">Photos stay in this browser until you choose Make available to charger.</p><button id="photo-save" class="btn btn-sm" disabled>Save prepared image</button><details><summary>Local Wi-Fi delivery</summary><p class="muted small">Run <code>npm run photo:serve</code> from the web folder. The helper serves only your prepared photo on your local network for 10 minutes. The charger and computer must be on the same network.</p><label for="photo-address">Computer Wi-Fi IP (optional)</label><input id="photo-address" class="select" placeholder="Automatic"></details><button id="photo-share" class="btn btn-sm" disabled>Make available to charger</button></details><label for="clock-image-url">Device-ready image URL</label><input id="clock-image-url" class="select" type="url" placeholder="https://…"><label for="clock-image-id">Theme ID</label><input id="clock-image-id" class="select" type="number" min="0" max="4294967295" value="0"><label for="clock-image-crc">File CRC32 (8 hex digits)</label><input id="clock-image-crc" class="select" pattern="[0-9a-fA-F]{8}" placeholder="00000000"><label for="clock-text-color">Clock text color</label><input id="clock-text-color" type="color" value="#ffffff"><p class="muted small">The charger downloads the file over Wi-Fi. You can prepare a local photo above or use an existing clock image URL. Photo delivery is experimental until the image format is verified on the charger.</p></div><p id="clock-current" class="muted small" aria-live="polite">Read the device to see its current clock style.</p><button id="read-clock-theme" class="btn btn-sm">Read clock settings</button><button id="apply-clock-theme" class="btn btn-sm">Apply clock style</button><p id="clock-theme-result" class="muted small" role="status">Changes are sent only when you press Apply.</p></div>
+          <p id="charger-setting-result" class="muted small" role="status">Current values are read from the charger where supported. Other fields remain choices to apply.</p>
+        </div>
+        <p class="muted small">
+          These write settings to the device. If a button does nothing, the command may not be
+          supported by your model — check the log below.
+        </p>
+      </section>
+
+      <!-- 5. Log -->
+      <section class="card" id="log-card" hidden>
+        <div class="card-head">
+          <h2>Connection diagnostics</h2>
+          <div class="row">
+            <button id="log-clear" class="btn btn-sm">Clear</button>
+            <button id="log-download" class="btn btn-sm">Download</button>
+          </div>
+        </div>
+        <p class="muted small">
+          Every frame in both directions, decoded. Useful for reporting issues or for
+          adding support for a new model.
+        </p>
+        <label class="debug-toggle"><input type="checkbox" id="debug-toggle"> Protocol debug mode</label>
+        <div id="protocol-debug" hidden><p id="protocol-summary" class="muted small"></p><div id="protocol-events"></div></div>
+        <pre id="log" class="log" aria-label="Protocol frames"></pre>
+      </section>
+
+      <!-- About -->
+      <section class="card" id="about">
+        <h2>About</h2>
+        <p>
+          This is an independent, free and open-source client for Anker's BLE-enabled devices.
+          It talks to the device directly from your browser using
+          <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API"
+            >Web Bluetooth</a
+          >. Nothing is sent to any server: there is no backend, no account, and no telemetry.
+          The page is static and can be self-hosted.
+        </p>
+        <details><summary>How the device connection works</summary><p class="muted">
+          <strong>Security note:</strong> the device's BLE link uses AES with a fixed key that
+          ships inside the official app, and the initialisation vector is the device serial
+          number. Anyone in Bluetooth range may be able to talk to
+          the device. See <code>docs/PROTOCOL.md</code> §4.3.
+        </p></details>
+        <p class="muted">
+          Not affiliated with, endorsed by, or supported by Anker. Use at your own risk,
+          on hardware you own.
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <span>MIT licensed · no tracking · runs entirely in your browser</span>
+      </div>
+    </footer>
+
+    <template id="port-row">
+      <tr>
+        <td class="port-name"></td>
+        <td class="port-mode"></td>
+        <td class="port-volt"></td>
+        <td class="port-amp"></td>
+        <td class="port-watt"></td>
+      </tr>
+    </template>
+
+    <!--
+      Boot probe. Classic scripts (unlike modules) are allowed over file://, so
+      this can report the failure that the module itself cannot.
+    -->
+    <script>
+      (function () {
+        var FILE_HINT =
+          "This page was opened directly from disk (file://), so the browser blocked " +
+          "the app's JavaScript module. Serve the folder instead.";
+
+        function show(title, body) {
+          var box = document.getElementById("load-error");
+          if (!box) return;
+          if (title) document.getElementById("load-error-title").textContent = title;
+          document.getElementById("load-error-body").textContent = body;
+          box.hidden = false;
+        }
+
+        // Report a module that fails to load or throws while evaluating.
+        window.__ankerBootFailed = function (detail) {
+          show(null, FILE_HINT + (detail ? " (" + detail + ")" : ""));
+        };
+        window.addEventListener("error", function (e) {
+          if (e && e.target && e.target.tagName === "SCRIPT") {
+            window.__ankerBootFailed("script failed to load: " + (e.target.src || "inline"));
+          }
+        }, true);
+
+        // A module blocked by CORS may not fire an error event at all, so also
+        // check whether the app actually booted.
+        setTimeout(function () {
+          if (window.__ankerReady) return;
+          if (location.protocol === "file:") {
+            show(null, FILE_HINT);
+          } else {
+            show(
+              "The app failed to start",
+              "The page loaded but its JavaScript did not run. Check the browser " +
+                "console for the error, and make sure src/ is being served alongside " +
+                "index.html.",
+            );
+          }
+        }, 2500);
+      })();
+    </script>
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>

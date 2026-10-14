@@ -1,0 +1,35 @@
+{
+  "name": "openankerproto-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Free, open-source Web Bluetooth client for Anker BLE devices - an alternative to the official app",
+  "keywords": [
+    "anker",
+    "bluetooth",
+    "web-bluetooth",
+    "power-bank",
+    "reverse-engineering"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test tests/",
+    "test:vectors": "node scripts/sync-vectors.mjs --check",
+    "test:browser": "node scripts/verify-browser.mjs",
+    "test:ui": "node scripts/build.mjs --base / && node scripts/smoke-ui.mjs",
+    "test:all": "npm run test:vectors && npm test && npm run test:browser && npm run test:ui && npm run test:subpath",
+    "serve": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "sync-vectors": "node scripts/sync-vectors.mjs",
+    "screenshots": "node scripts/build.mjs --base / && node scripts/screenshot.mjs --demo",
+    "screenshots:all": "node scripts/build.mjs --base / && node scripts/screenshot.mjs && node scripts/screenshot.mjs --demo",
+    "test:subpath": "node scripts/build.mjs --base \"/${PAGES_BASE:-repo-name}/\" && node scripts/verify-subpath.mjs --base \"/${PAGES_BASE:-repo-name}/\"",
+    "preview:pages": "node scripts/serve.mjs --port 8080 --base \"/${PAGES_BASE:-repo-name}/\"",
+    "photo:serve": "node scripts/photo-server.mjs",
+    "cloud:serve": "node scripts/cloud-server.mjs",
+    "firmware:dry-run": "node scripts/firmware-dry-run.mjs"
+  }
+}

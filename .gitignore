@@ -1,0 +1,68 @@
+# Publish only the project and repository metadata from this research workspace.
+/*
+!/.gitignore
+!/README.md
+!/LICENSE
+!/.github/
+!/ankerproto/
+
+# AI assistants, prompts, local agent state, and credentials (at any depth)
+.agents/
+.agent/
+.codex/
+.claude/
+.cursor/
+.aider*
+.continue/
+.windsurf/
+.github/copilot-instructions.md
+.github/instructions/
+.github/prompts/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.cursorrules
+.cursorignore
+.windsurfrules
+.mcp.json
+mcp.json
+*openai-key*
+*api-key*
+.env
+.env.*
+*.pem
+*.key
+credentials*.json
+secrets*.json
+
+# Research inputs, captures, and local output
+work/
+*.apk
+*.pcap
+*.pcapng
+*.log
+screenshots/
+.chrome*/
+# The active workflow lives at repository root.
+/ankerproto/.github/
+
+# Python, Node, build output, and caches
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+node_modules/
+dist/
+build/
+coverage/
+.cache/
+target/
+
+# Editor and OS state
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo

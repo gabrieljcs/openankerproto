@@ -1,0 +1,128 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python protocol client
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        working-directory: ankerproto
+        run: |
+          python -m pip install --upgrade pip
+          pip install pycryptodome pytest
+
+      - name: Tests
+        working-directory: ankerproto
+        run: python tests/test_protocol.py
+
+      - name: Vectors are reproducible
+        working-directory: ankerproto
+        run: |
+          python tests/generate_vectors.py
+          git diff --exit-code tests/vectors.json \
+            || { echo "::error::vectors.json is stale; run tests/generate_vectors.py and commit"; exit 1; }
+
+  web:
+    name: Web client
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Vectors are in sync with Python
+        working-directory: ankerproto/web
+        run: node scripts/sync-vectors.mjs --check
+
+      - name: Unit tests
+        working-directory: ankerproto/web
+        run: node --test tests/
+
+      - name: Build
+        working-directory: ankerproto/web
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+        run: node scripts/build.mjs --base "/${{ github.event.repository.name }}/"
+
+      # Chrome is preinstalled on GitHub-hosted runners, so the browser checks
+      # that catch WebCrypto differences actually run here.
+      - name: Browser verification (WebCrypto parity)
+        working-directory: ankerproto/web
+        run: node scripts/verify-browser.mjs --verbose
+
+      # Pages serves a project site from /<repo>/, not /. This catches the
+      # class of bug where every asset 404s and the page renders but does nothing.
+      - name: Sub-path deployment verification
+        working-directory: ankerproto/web
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+        run: |
+          node scripts/build.mjs --base "/${{ github.event.repository.name }}/"
+          node scripts/verify-subpath.mjs --base "/${{ github.event.repository.name }}/" --verbose
+
+      - name: UI smoke test
+        working-directory: ankerproto/web
+        run: node scripts/smoke-ui.mjs
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: ankerproto/web/dist
+          retention-days: 7
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: [python, web]
+    # Must match the push branches above: triggering on master but only deploying
+    # from main would test, build, and then silently never publish.
+    if: |
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build site
+        working-directory: ankerproto/web
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+        run: node scripts/build.mjs --base "/${{ github.event.repository.name }}/"
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ankerproto/web/dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

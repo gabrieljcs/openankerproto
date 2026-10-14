@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Node (web client)
+node_modules/
+dist/
+.chrome-profile/
+.chrome-smoke/
+npm-debug.log*
+
+# Rust/Go leftovers, editors, OS
+target/
+.DS_Store
+.idea/
+.vscode/
+*.swp

@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>ankerproto — browser verification</title>
+  </head>
+  <body>
+    <p>
+      Runs the protocol checks inside a real browser and writes the outcome to
+      <code>window.__RESULT</code>. Driven by <code>scripts/verify-browser.mjs</code>.
+    </p>
+    <pre id="out">running…</pre>
+
+    <script type="module">
+      /**
+       * Browser-side checks.
+       *
+       * The important check is AES-CBC: Node's WebCrypto does not strip PKCS#7
+       * padding on decrypt, while browsers do - both silently. `src/crypto.js`
+       * probes and normalises; this page is what proves it in the browser the
+       * app actually ships to.
+       */
+
+      const checks = [];
+      const add = (name, pass, detail = "") => checks.push({ name, pass: Boolean(pass), detail });
+
+      let vectors = null;
+      try {
+        const res = await fetch("../tests/vectors.json");
+        vectors = await res.json();
+      } catch (err) {
+        window.__RESULT = {
+          checks: [{ name: "load vectors.json", pass: false, detail: String(err) }],
+          error: `could not load vectors: ${err}`,
+        };
+        document.getElementById("out").textContent = "could not load vectors";
+      }
+
+      if (vectors) {
+        try {
+          const { toHex, fromHex, buildFrame, parseFrame, xorChecksum } = await import("../src/framing.js");
+          const { encodeTlv, decodeTlv, Tlv } = await import("../src/tlv.js");
+          const {
+            A2_STATIC_VALUE,
+            INITIAL_KEY,
+            AesContext,
+            cryptoAvailable,
+            initialContext,
+            pkcs7Pad,
+            pkcs7Unpad,
+          } = await import("../src/crypto.js");
+          const { AnkerSession } = await import("../src/session.js");
+          const { ScriptedDevice } = await import("../src/transport.js");
+          const { bluetoothAvailable, bluetoothUnavailableReason } = await import("../src/bluetooth.js");
+          const { OPCODE_NAMES } = await import("../src/opcodes.js");
+
+          add("secure context", window.isSecureContext, location.origin);
+          add("crypto.subtle present", cryptoAvailable());
+          add("navigator.bluetooth present", bluetoothAvailable(),
+            bluetoothUnavailableReason() ?? "");
+
+          // --- framing parity ---
+          let framingOk = true;
+          let framingDetail = "";
+          for (const v of vectors.frames) {
+            const built = buildFrame(v.command, fromHex(v.payload_hex), {
+              group: v.group,
+              encrypted: v.encrypted,
+              response: v.response,
+            });
+            if (toHex(built) !== v.frame_hex) {
+              framingOk = false;
+              framingDetail = `cmd 0x${v.command.toString(16)}: ${toHex(built)} != ${v.frame_hex}`;
+              break;
+            }
+            const parsed = parseFrame(built);
+            if (parsed.command !== v.command || toHex(parsed.payload) !== v.payload_hex) {
+              framingOk = false;
+              framingDetail = `round-trip failed for cmd 0x${v.command.toString(16)}`;
+              break;
+            }
+          }
+          add("framing matches Python vectors", framingOk, framingDetail);
+
+          // --- checksum ---
+          const f = buildFrame(0x0001, Uint8Array.of(0xde, 0xad, 0xbe, 0xef));
+          add("checksum is XOR of preceding bytes",
+            f[f.length - 1] === xorChecksum(f.subarray(0, f.length - 1)));
+
+          // --- padding primitives ---
+          const padOk = vectors.crypto.every(
+            (v) => toHex(pkcs7Pad(fromHex(v.plaintext_hex))) === v.padded_hex,
+          );
+          add("PKCS#7 padding matches Python vectors", padOk);
+
+          // --- the critical one: AES-CBC parity in a real browser ---
+          let cryptoOk = true;
+          let cryptoDetail = "";
+          const observations = [];
+          for (const v of vectors.crypto) {
+            const key = fromHex(v.key_hex);
+            const iv = fromHex(v.iv_hex);
+            const plaintext = fromHex(v.plaintext_hex);
+            const ck = await crypto.subtle.importKey("raw", key, { name: "AES-CBC" }, false, [
+              "encrypt",
+              "decrypt",
+            ]);
+            const ctx = new AesContext(key, iv, v.phase, ck);
+            const cipher = await ctx.encrypt(plaintext);
+
+            observations.push(`raw${plaintext.length}->${cipher.length}`);
+            if (toHex(cipher) !== v.ciphertext_hex) {
+              cryptoOk = false;
+              cryptoDetail = `${v.phase}/${v.serial}: got ${toHex(cipher)} expected ${v.ciphertext_hex}`;
+              break;
+            }
+            const back = await ctx.decrypt(cipher);
+            if (toHex(back) !== v.plaintext_hex) {
+              cryptoOk = false;
+              cryptoDetail = `${v.phase}/${v.serial}: decrypt round-trip gave ${toHex(back)}`;
+              break;
+            }
+          }
+          add("AES-CBC ciphertext matches Python vectors (browser)", cryptoOk, cryptoDetail);
+          add("observed ciphertext lengths", true, observations.join(" "));
+
+          // --- TLV parity ---
+          const realTags = decodeTlv(fromHex(vectors.real_payload.hex));
+          const tagsOk =
+            realTags.length === vectors.real_payload.tags.length &&
+            realTags.every(
+              (t, i) =>
+                t.tag === vectors.real_payload.tags[i].tag &&
+                toHex(t.value) === vectors.real_payload.tags[i].value_hex,
+            );
+          add("real captured payload decodes identically", tagsOk,
+            `${realTags.length} tags`);
+
+          add("opcode table matches Python",
+            Object.keys(OPCODE_NAMES).length === Object.keys(vectors.opcodes).length);
+
+          // --- full handshake in the browser ---
+          try {
+            const device = new ScriptedDevice();
+            const session = new AnkerSession(device);
+            const info = await session.connect();
+            const st = await session.readStatus();
+            add("full handshake in browser",
+              info.serialNumber === "A8B9C0D1E2F30001" &&
+                info.firmwareVersion === "1.6.2" &&
+                info.btMac === "aa:bb:cc:dd:ee:ff",
+              `${info.serialNumber} / ${info.firmwareVersion} / ${info.btMac}`);
+            add("status decode in browser",
+              st.batteryPercent === 87.5 && st.ports.C1 && st.ports.C1.power === 300,
+              `battery=${st.batteryPercent} c1=${st.ports.C1?.power}W`);
+            add("session key established in browser", session.sessionKey.length === 16);
+          } catch (err) {
+            add("full handshake in browser", false, String(err?.message ?? err));
+          }
+        } catch (err) {
+          add("browser check harness", false, String(err?.stack ?? err));
+        }
+      }
+
+      window.__RESULT = { checks };
+      document.getElementById("out").textContent = checks
+        .map((c) => `${c.pass ? "ok  " : "FAIL"}  ${c.name}${c.detail ? `\n       ${c.detail}` : ""}`)
+        .join("\n");
+    </script>
+  </body>
+</html>

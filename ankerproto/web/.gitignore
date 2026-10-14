@@ -1,0 +1,9 @@
+dist/
+node_modules/
+screenshots/
+.chrome-profile/
+.chrome-smoke/
+.chrome-shots/
+.chrome-subpath/
+
+# Runtime device artwork is tracked for the Pages build.

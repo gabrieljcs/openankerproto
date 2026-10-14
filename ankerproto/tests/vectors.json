@@ -1,0 +1,500 @@
+{
+ "crypto": [
+  {
+   "ciphertext_hex": "9f5767e7af594815180869ee29f892d1",
+   "iv_hex": "41384239433044314532463330303031",
+   "key_hex": "32633337376466613039636462373932",
+   "padded_hex": "a101000000000a0a0a0a0a0a0a0a0a0a",
+   "phase": "initial",
+   "plaintext_hex": "a10100000000",
+   "serial": "A8B9C0D1E2F30001"
+  },
+  {
+   "ciphertext_hex": "48b67419fcbaa874ccdc4892e1388ed6",
+   "iv_hex": "41384239433044314532463330303031",
+   "key_hex": "32633337376466613039636462373932",
+   "padded_hex": "a101310d0d0d0d0d0d0d0d0d0d0d0d0d",
+   "phase": "initial",
+   "plaintext_hex": "a10131",
+   "serial": "A8B9C0D1E2F30001"
+  },
+  {
+   "ciphertext_hex": "8e9884edf98a6be4a9b1ff8ad42d3a2c",
+   "iv_hex": "41384239433044314532463330303031",
+   "key_hex": "000102030405060708090a0b0c0d0e0f",
+   "padded_hex": "a101000000000a0a0a0a0a0a0a0a0a0a",
+   "phase": "session",
+   "plaintext_hex": "a10100000000",
+   "serial": "A8B9C0D1E2F30001"
+  },
+  {
+   "ciphertext_hex": "9074a409271581602ead2c076b3a1bcf",
+   "iv_hex": "41384239433044314532463330303031",
+   "key_hex": "000102030405060708090a0b0c0d0e0f",
+   "padded_hex": "a101310d0d0d0d0d0d0d0d0d0d0d0d0d",
+   "phase": "session",
+   "plaintext_hex": "a10131",
+   "serial": "A8B9C0D1E2F30001"
+  },
+  {
+   "ciphertext_hex": "cdf00795a2fe4bdecd60505bad79fbb2",
+   "iv_hex": "31323334353637383930414243444546",
+   "key_hex": "32633337376466613039636462373932",
+   "padded_hex": "a101000000000a0a0a0a0a0a0a0a0a0a",
+   "phase": "initial",
+   "plaintext_hex": "a10100000000",
+   "serial": "1234567890ABCDEF"
+  },
+  {
+   "ciphertext_hex": "7045a1c0bb22a2a7e9b78ed17540decd",
+   "iv_hex": "31323334353637383930414243444546",
+   "key_hex": "32633337376466613039636462373932",
+   "padded_hex": "a101310d0d0d0d0d0d0d0d0d0d0d0d0d",
+   "phase": "initial",
+   "plaintext_hex": "a10131",
+   "serial": "1234567890ABCDEF"
+  },
+  {
+   "ciphertext_hex": "bc0a5fb1c7bd0527d78814d9aa69cdc4",
+   "iv_hex": "31323334353637383930414243444546",
+   "key_hex": "000102030405060708090a0b0c0d0e0f",
+   "padded_hex": "a101000000000a0a0a0a0a0a0a0a0a0a",
+   "phase": "session",
+   "plaintext_hex": "a10100000000",
+   "serial": "1234567890ABCDEF"
+  },
+  {
+   "ciphertext_hex": "3dc1349791db7f703d757eededf51a02",
+   "iv_hex": "31323334353637383930414243444546",
+   "key_hex": "000102030405060708090a0b0c0d0e0f",
+   "padded_hex": "a101310d0d0d0d0d0d0d0d0d0d0d0d0d",
+   "phase": "session",
+   "plaintext_hex": "a10131",
+   "serial": "1234567890ABCDEF"
+  }
+ ],
+ "frames": [
+  {
+   "command": 1,
+   "encrypted": false,
+   "frame_hex": "ff0939000300010001a10400000000a22832633337376466613039636462373932343838396534323932613337663631633863356564353264bc",
+   "group": 1,
+   "payload_hex": "a10400000000a22832633337376466613039636462373932343838396534323932613337663631633863356564353264",
+   "response": false
+  },
+  {
+   "command": 3,
+   "encrypted": false,
+   "frame_hex": "ff0940000300010003a10411223344a22832633337376466613039636462373932343838396534323932613337663631633863356564353264a30120a40200f057",
+   "group": 1,
+   "payload_hex": "a10411223344a22832633337376466613039636462373932343838396534323932613337663631633863356564353264a30120a40200f0",
+   "response": false
+  },
+  {
+   "command": 41,
+   "encrypted": false,
+   "frame_hex": "ff0939000300010029a10411223344a22832633337376466613039636462373932343838396534323932613337663631633863356564353264d0",
+   "group": 1,
+   "payload_hex": "a10411223344a22832633337376466613039636462373932343838396534323932613337663631633863356564353264",
+   "response": false
+  },
+  {
+   "command": 1280,
+   "encrypted": false,
+   "frame_hex": "ff090c000300110d00a1012164",
+   "group": 17,
+   "payload_hex": "a10121",
+   "response": true
+  },
+  {
+   "command": 1,
+   "encrypted": false,
+   "frame_hex": "ff090d000300010001deadbeefda",
+   "group": 1,
+   "payload_hex": "deadbeef",
+   "response": false
+  },
+  {
+   "command": 34,
+   "encrypted": true,
+   "frame_hex": "ff0919000300014022000000000000000000000000000000008f",
+   "group": 1,
+   "payload_hex": "00000000000000000000000000000000",
+   "response": false
+  },
+  {
+   "command": 34,
+   "encrypted": true,
+   "frame_hex": "ff09190003000148221111111111111111111111111111111187",
+   "group": 1,
+   "payload_hex": "11111111111111111111111111111111",
+   "response": true
+  }
+ ],
+ "opcodes": {
+  "0001": "startConnectReq",
+  "0002": "startDisconnectReq",
+  "0003": "capabilityNegotiationReq",
+  "0004": "configureCapabilityReq",
+  "0005": "setCapabilityReq",
+  "0021": "getModuleInfoReq / getPublicKeyReq",
+  "0022": "getAesKeyReq / scanWifiReq",
+  "0023": "bindUserIdReq / getWifiListReq",
+  "0024": "connectWifiReq",
+  "0025": "activateWifiReq",
+  "0027": "getAuthenticationReq",
+  "0029": "getDeviceInfoReq",
+  "002e": "sendOtaSubPackageReq",
+  "0030": "getZXOTAStateReq",
+  "0031": "getScanBluetoothDeviceReq / requestModuleLogUploadReq",
+  "0032": "getBindBluetoothDeviceReq / moduleLogUploadRes",
+  "0033": "getUnBindBluetoothDeviceReq",
+  "0035": "exitConnectReq",
+  "0036": "setMultiDevicesReq",
+  "0037": "getMultiDevicesReq / getMultiDevicesRes",
+  "0057": "setDeviceUpdateEnergyReq",
+  "005e": "setSuperChargeReq",
+  "005f": "setBMSSubBatteryPowerSwitchReq",
+  "0060": "setBMSSubBatteryLightSwitchReq",
+  "0061": "getAllBMSSubBatteryInfoReq / setA17b1CommandReq",
+  "0065": "requestMcuLogUploadReq",
+  "0066": "mcuLogUploadReq",
+  "0067": "bleOtaProgressReq",
+  "0069": "deviceFactorySettingRes",
+  "006a": "deviceFactorySettingClearRes",
+  "0074": "getA17B2DeviceInfoReq",
+  "0076": "carPortSavingReq",
+  "0077": "acOutputSmartReq",
+  "007a": "setRelaySwitchReq",
+  "007b": "setLocationLightReq",
+  "007c": "setTimingReq",
+  "007d": "getTimingReq",
+  "007e": "setCountdownReq",
+  "007f": "getCountdownReq",
+  "0089": "getOTAStateReq",
+  "0200": "getMiniChargeAllDeviceInfoReq",
+  "0201": "setMiniChargeResetReq",
+  "0202": "getMiniChargeScreensaverReq",
+  "0203": "setMiniChargeScreenTimeoutReq",
+  "0204": "setMiniChargeScreenBrightnessReq",
+  "0205": "setMiniChargeScreensaverReq",
+  "0206": "setMiniChargeACRelaySwitchReq / setMiniChargeACRelaySwitchRes",
+  "0207": "setMiniChargeACRelaySwitchReq",
+  "0400": "postErrorInfoReq",
+  "0401": "postSwitchStateReq",
+  "0402": "postWorkInfoReq",
+  "0403": "postDeviceInfoReq",
+  "0404": "postCountDownTimeReq",
+  "0405": "postDeviceAllInfoReq",
+  "0406": "postUpgradeStateReq / postUpgradeStateRes",
+  "0409": "postAllBMSMinorBatteryBTInfoReq",
+  "040a": "postAllBMSMinorBatteryWiFiInfoReq",
+  "040e": "getMicroInverterReq",
+  "040f": "postSubBatteryErrorInfoReq",
+  "0410": "postA17B2DeviceInfoWIFIReq",
+  "0411": "postA17B2DeviceInfoBTReq",
+  "0460": "getDeviceSelfTestRes",
+  "0489": "upUpgradeCondition",
+  "0500": "postA17b1DeviceInfoReq",
+  "0501": "postA17b1SelfCheckReq",
+  "0503": "postDeviceListReq",
+  "0601": "postA1790DeviceInfoReq",
+  "0602": "setA1790CommandReq",
+  "0604": "postGetUpdateListReq",
+  "0801": "startConnectRes",
+  "0802": "startDisconnectRes",
+  "0803": "capabilityNegotiationRes",
+  "0805": "setCapabilityRes",
+  "0821": "getModuleInfoRes / getPublicKeyRes",
+  "0822": "getAesKeyRes / scanWifiRes",
+  "0823": "bindUserIdRes / getWifiListRes",
+  "0824": "connectWifiRes",
+  "0825": "activateWifiRes",
+  "0827": "getAuthenticationRes",
+  "0829": "getDeviceInfoRes",
+  "0830": "getZXOTAStateRes",
+  "0831": "getScanBluetoothDeviceRes / requestModuleLogUploadRes",
+  "0832": "getBindBluetoothDeviceRes",
+  "0833": "getUnBindBluetoothDeviceRes",
+  "0835": "exitConnectRes",
+  "0836": "setMultiDevicesRes",
+  "0840": "getAllDeviceInfoRes",
+  "0841": "getAcCarCountDownTimeRes",
+  "0842": "setAcCountDownTimeRes / setCarCountDownTimeRes",
+  "0844": "setAcChargePowerRes",
+  "0845": "setDeviceWaitTimeRes",
+  "0846": "setDeviceScreenTimeRes",
+  "0847": "setInversionWaitTimeRes",
+  "0848": "setMajorPkgRes",
+  "0849": "setMinorPkgRes",
+  "084a": "setAcSwitchRes",
+  "084b": "setCarSwitchRes",
+  "084c": "setLcdLightRes",
+  "084d": "setAcFrequencyRes",
+  "084e": "setEnergyModeRes",
+  "084f": "setAmbientLightRes",
+  "0850": "setTempUnitRes",
+  "0851": "setResetRes",
+  "085e": "setDischargeTimeRes / setSuperChargeRes",
+  "085f": "setBMSSubBatteryPowerSwitchRes",
+  "0860": "setBMSSubBatteryLightSwitchRes",
+  "0861": "getAllBMSSubBatteryInfoRes / setA17b1CommandRes",
+  "0865": "requestMcuLogUploadRes",
+  "0866": "mcuLogUploadRes",
+  "0867": "bleOtaProgressRes",
+  "0869": "deviceFactorySettingReq",
+  "086a": "deviceFactorySettingClearReq",
+  "0874": "getA17B2DeviceInfoRes",
+  "0876": "carPortSavingRes",
+  "0877": "acOutputSmartRes",
+  "087a": "setRelaySwitchRes",
+  "087b": "setLocationLightRes",
+  "087c": "setTimingRes",
+  "087d": "getTimingRes",
+  "087e": "setCountdownRes",
+  "087f": "getCountdownRes",
+  "0889": "getOTAStateRes",
+  "0a00": "getMiniChargeAllDeviceInfoRes",
+  "0a01": "setMiniChargeResetRes",
+  "0a02": "getMiniChargeScreensaverRes",
+  "0a03": "setMiniChargeScreenTimeoutRes",
+  "0a04": "setMiniChargeScreenBrightnessRes",
+  "0a05": "setMiniChargeScreensaverRes",
+  "0a07": "setMiniChargeACRelaySwitchRes"
+ },
+ "real_payload": {
+  "hex": "a10131a2050300000000a3050300000000a403026b06a503020000a603020000a703020000a803020000a903020000aa03020000ab03020000ac03020000ad03020000ae03020000af03020000b003020100b103020000b203020000b30302a600b403020000b503020000b60302ff01b703020000b803029a00b903020000ba0302a600bb03020000bc020100bd020117be020100bf020101c0020100c1020157c2020164c3020164c4020100c5020100c6020100c7020100c8020100c9020100ca020100cb020100cc020100cd020100ce020100cf020100d0110041504339464530453237333030323735e5020100",
+  "tags": [
+   {
+    "tag": 161,
+    "value_hex": "31"
+   },
+   {
+    "tag": 162,
+    "value_hex": "0300000000"
+   },
+   {
+    "tag": 163,
+    "value_hex": "0300000000"
+   },
+   {
+    "tag": 164,
+    "value_hex": "026b06"
+   },
+   {
+    "tag": 165,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 166,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 167,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 168,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 169,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 170,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 171,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 172,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 173,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 174,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 175,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 176,
+    "value_hex": "020100"
+   },
+   {
+    "tag": 177,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 178,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 179,
+    "value_hex": "02a600"
+   },
+   {
+    "tag": 180,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 181,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 182,
+    "value_hex": "02ff01"
+   },
+   {
+    "tag": 183,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 184,
+    "value_hex": "029a00"
+   },
+   {
+    "tag": 185,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 186,
+    "value_hex": "02a600"
+   },
+   {
+    "tag": 187,
+    "value_hex": "020000"
+   },
+   {
+    "tag": 188,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 189,
+    "value_hex": "0117"
+   },
+   {
+    "tag": 190,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 191,
+    "value_hex": "0101"
+   },
+   {
+    "tag": 192,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 193,
+    "value_hex": "0157"
+   },
+   {
+    "tag": 194,
+    "value_hex": "0164"
+   },
+   {
+    "tag": 195,
+    "value_hex": "0164"
+   },
+   {
+    "tag": 196,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 197,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 198,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 199,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 200,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 201,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 202,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 203,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 204,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 205,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 206,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 207,
+    "value_hex": "0100"
+   },
+   {
+    "tag": 208,
+    "value_hex": "0041504339464530453237333030323735"
+   },
+   {
+    "tag": 229,
+    "value_hex": "0100"
+   }
+  ]
+ },
+ "tlv": {
+  "a1_21": "a10121",
+  "a2_1": "a20101",
+  "a3_256": "a3020001",
+  "initial_key_hex": "32633337376466613039636462373932",
+  "static_ascii": "2c377dfa09cdb7924889e4292a37f61c8c5ed52d",
+  "static_blob": "32633337376466613039636462373932343838396534323932613337663631633863356564353264"
+ },
+ "uuids": [
+  {
+   "name": "prime-2215",
+   "notify": "22150003-4002-81c5-b46e-cf057c562025",
+   "service": "22150001-4002-81C5-b46e-cf057c562025",
+   "write": "22150002-4002-81c5-b46e-cf057c562025"
+  },
+  {
+   "name": "gen2-2540",
+   "notify": "25400003-4002-81c5-b46e-cf057c562025",
+   "service": "25400001-4002-81c5-b46e-cf057c562025",
+   "write": "25400002-4002-81c5-b46e-cf057c562025"
+  },
+  {
+   "name": "station-4158",
+   "notify": "41580003-4002-81c5-b46e-cf057c562025",
+   "service": "41580001-4002-81c5-b46e-cf057c562025",
+   "write": "41580002-4002-81c5-b46e-cf057c562025"
+  },
+  {
+   "name": "alt-8c85",
+   "notify": "8c850003-0302-41c5-b46e-cf057c562025",
+   "service": "8c850001-0302-41c5-b46e-cf057c562025",
+   "write": "8c850002-0302-41c5-b46e-cf057c562025"
+  }
+ ]
+}
