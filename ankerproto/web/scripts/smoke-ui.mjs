@@ -620,9 +620,22 @@ async function main() {
     } catch {
       /* ignore */
     }
-    chrome.kill("SIGKILL");
+    if (chrome.exitCode === null && chrome.signalCode === null) {
+      await new Promise(resolve => {
+        const timeout = setTimeout(resolve, 3000);
+        chrome.once("exit", () => { clearTimeout(timeout); resolve(); });
+        chrome.kill("SIGTERM");
+      });
+      if (chrome.exitCode === null && chrome.signalCode === null) chrome.kill("SIGKILL");
+    }
     server.close();
-    rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+    try {
+      rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
+    } catch (error) {
+      // A transient profile cleanup race must not replace the test result.
+      if (error.code !== "ENOTEMPTY" && error.code !== "EBUSY") throw error;
+      console.warn(`Temporary Chrome profile cleanup deferred: ${error.code}`);
+    }
   }
 
   return exitCode;
