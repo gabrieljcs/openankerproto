@@ -53,7 +53,7 @@ jobs:
 
       - name: Unit tests
         working-directory: ankerproto/web
-        run: node --test tests/
+        run: npm test
 
       - name: Build
         working-directory: ankerproto/web

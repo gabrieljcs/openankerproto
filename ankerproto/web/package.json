@@ -16,7 +16,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --test tests/",
+    "test": "node --test tests/*.test.js",
     "test:vectors": "node scripts/sync-vectors.mjs --check",
     "test:browser": "node scripts/verify-browser.mjs",
     "test:ui": "node scripts/build.mjs --base / && node scripts/smoke-ui.mjs",
