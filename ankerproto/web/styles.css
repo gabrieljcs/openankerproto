@@ -716,3 +716,14 @@ section[id] { scroll-margin-top:24px; }
 /* Keep both temperature units together in the compact instrument display. */
 #stat-temp { font-size: 17px; letter-spacing: -.7px; white-space: nowrap; line-height: 32px; }
 @media (max-width:380px) { #stat-temp { font-size:14px; } }
+
+.browser-compatibility { grid-column: 1 / -1; display:flex; align-items:center; gap:20px; border-left:3px solid var(--border); padding:20px 24px; }
+.browser-support-copy { flex:1; min-width:0; }
+.browser-compatibility .eyebrow { display:block; margin:0 0 7px; font-size:10px; }
+.browser-compatibility h2 { font-size:15px; margin-bottom:6px; }
+.browser-compatibility p { margin:0; font-size:12px; color:var(--muted); }
+.browser-compatibility[data-state=supported] { border-left-color:var(--ok); }
+.browser-compatibility[data-state=warning] { border-left-color:var(--warn); }
+.browser-compatibility[data-state=blocked] { border-left-color:var(--error); }
+.browser-compatibility[data-state=supported] h2 { color:var(--ok); }
+@media(max-width:520px) { .browser-compatibility { align-items:start; flex-direction:column; gap:12px; padding:18px; } }

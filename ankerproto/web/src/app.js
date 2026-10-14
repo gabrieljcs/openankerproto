@@ -1,3 +1,4 @@
+import { detectSupport } from "./support.js";
 import { renderChargerSettings, wireChargerControls } from './charger-controls.js';
 import { ProtocolDebug } from "./protocol-debug.js";
 import { PollLoop } from "./polling.js";
@@ -13,7 +14,7 @@ import { CHARGER_TAGS } from './charger-settings.js';
 
 import { TelemetryHistory, renderTimeline, sessionStatistics } from "./timeline.js";
 import { AnkerSession } from "./session.js";
-import { BluetoothTransport, bluetoothAvailable, bluetoothUnavailableReason } from "./bluetooth.js";
+import { BluetoothTransport, bluetoothAvailable } from "./bluetooth.js";
 import { RESPONSE_TAGS, OPCODE_NAMES } from "./opcodes.js";
 import { toHex } from "./framing.js";
 import { decodeTlv, stripStatus } from "./tlv.js";
@@ -66,6 +67,7 @@ let transport = null;
 /** @type {AnkerSession|null} */
 let session = null;
 let busy = false;
+let browserCanConnect = bluetoothAvailable();
 let refreshing = false;
 /** Name + UUID family of the active connection, from connect() or the demo. */
 let connectionInfo = null;
@@ -508,7 +510,7 @@ async function connect(_event, authorizedDevice = null) {
     el.deviceCard.hidden = true;
     el.statusCard.hidden = true;
     el.controlsCard.hidden = true;
-    el.connectBtn.disabled = false;
+    el.connectBtn.disabled = !demoMode() && !browserCanConnect;
     el.disconnectBtn.disabled = true;
   } finally {
     busy = false;
@@ -525,7 +527,7 @@ function handleDisconnect() {
   el.connectBtn.classList.remove("is-connected");
   setBadge("disconnected");
   setConnectStatus("Device disconnected.");
-  el.connectBtn.disabled = false;
+  el.connectBtn.disabled = !demoMode() && !browserCanConnect;
   el.disconnectBtn.disabled = true;
   transport = null;
   session = null;
@@ -542,7 +544,7 @@ async function disconnect() {
   el.connectBtn.classList.remove("is-connected");
   setBadge("disconnected");
   setConnectStatus("Disconnected.");
-  el.connectBtn.disabled = false;
+  el.connectBtn.disabled = !demoMode() && !browserCanConnect;
   el.disconnectBtn.disabled = true;
   showDemoBanner(false);
   el.deviceCard.hidden = true;
@@ -617,11 +619,7 @@ async function sendSetting(what, value) {
 function init() {
   // Signals the boot probe in index.html that the module loaded and ran.
   window.__ankerReady = true;
-  if (navigator.brave?.isBrave) {
-    Promise.resolve(navigator.brave.isBrave()).then(isBrave => {
-      if (isBrave) $("browser-warning").hidden = false;
-    }).catch(() => {});
-  }
+
 
   // Point at the real repo if the deployer set one.
   const repo = document.querySelector('meta[name="repo-url"]')?.content;
@@ -630,19 +628,23 @@ function init() {
     el.repoLink.hidden = false;
   }
 
-  // Demo mode needs no Bluetooth, so it must stay reachable in Safari/Firefox -
-  // which is precisely where it is most useful, since a real connection is
-  // impossible there.
-  if (!bluetoothAvailable()) {
-    el.unsupported.hidden = false;
-    el.unsupportedReason.textContent = bluetoothUnavailableReason() ?? "";
-    const note = document.createElement("p");
-    note.className = "small";
-    note.innerHTML =
-      "You can still explore the full interface in <strong>demo mode</strong> below.";
-    el.unsupportedReason.after(note);
-    el.connectBtn.disabled = !demoMode();
+  async function updateBrowserSupport() {
+    const button = $("browser-recheck");
+    button.disabled = true;
+    try {
+      const support = await detectSupport();
+      browserCanConnect = support.canConnect;
+      $("browser-compatibility").dataset.state = support.state;
+      $("browser-name").textContent = support.browser;
+      $("browser-support-title").textContent = support.title;
+      $("browser-support-detail").textContent = support.message;
+      if (!transport && !busy && !demoMode()) el.connectBtn.disabled = !support.canConnect;
+    } finally { button.disabled = false; }
   }
+  el.connectBtn.disabled = !bluetoothAvailable() && !demoMode();
+  updateBrowserSupport();
+  $("browser-recheck").addEventListener("click", updateBrowserSupport);
+  navigator.bluetooth?.addEventListener?.("availabilitychanged", updateBrowserSupport);
 
   // Demo mode: `?demo=1` enters it immediately; the header button toggles it.
   if (demoMode()) {

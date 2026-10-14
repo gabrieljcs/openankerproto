@@ -114,6 +114,15 @@
         <p>Brave reports a Chrome-like browser identity but disables Web Bluetooth by default. If its picker is empty or blocked, open this same address in Google Chrome or Microsoft Edge. “Show all nearby devices” cannot override a browser restriction. Demo mode remains available.</p>
       </section>
 
+      <section id="browser-compatibility" class="card browser-compatibility" aria-labelledby="browser-support-title" data-state="checking">
+        <div class="browser-support-copy" role="status" aria-live="polite">
+          <span id="browser-name" class="eyebrow">BROWSER COMPATIBILITY</span>
+          <h2 id="browser-support-title">Checking Bluetooth support…</h2>
+          <p id="browser-support-detail">Checking this browser's capabilities. No device access is requested.</p>
+        </div>
+        <button id="browser-recheck" class="btn btn-sm" type="button">Recheck</button>
+      </section>
+
       <!-- 1. Connect -->
       <section class="card" id="connect-card">
         <div class="card-head">

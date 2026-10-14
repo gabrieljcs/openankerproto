@@ -24,7 +24,7 @@ import { ADVERTISED_16BIT_UUIDS, UUID_FAMILIES } from "./uuids.js";
 
 /** Is Web Bluetooth usable in this browser/context at all? */
 export function bluetoothAvailable() {
-  return typeof navigator !== "undefined" && Boolean(navigator.bluetooth);
+  return typeof navigator !== "undefined" && typeof navigator.bluetooth?.requestDevice === "function";
 }
 
 /** Human-readable reason the API is missing, for the UI to show. */
