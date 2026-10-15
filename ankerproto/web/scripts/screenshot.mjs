@@ -137,7 +137,8 @@ async function main() {
 
   try {
     await waitForCdp(debugPort);
-    const suffix = demo ? "?demo=1" : "";
+    const photoEditor = process.argv.includes("--photo-editor");
+    const suffix = demo ? "?demo=1" + (photoEditor ? "&model=A2345" : "") : "";
 
     // Create each target with its URL directly. Navigating an existing target
     // means evaluating during the context swap, which silently yields undefined.
@@ -204,6 +205,26 @@ async function main() {
           expression: "document.getElementById('timeline-section').open = true; document.getElementById('poll-toggle').click()",
         });
         await new Promise(r => setTimeout(r, 6500));
+      }
+
+      if (photoEditor) {
+        await cdp.send("Runtime.evaluate", {
+          expression: `(async () => {
+            document.getElementById('clock-style').value = '3';
+            document.getElementById('clock-style').dispatchEvent(new Event('change'));
+            const blob = await (await fetch('assets/device/a2345-hero.webp')).blob();
+            const transfer = new DataTransfer(); transfer.items.add(new File([blob], 'charger.webp', {type:'image/webp'}));
+            const input = document.getElementById('photo-file'); input.files = transfer.files; input.dispatchEvent(new Event('change'));
+            for (let i=0;i<50 && document.getElementById('photo-save').disabled;i++) await new Promise(r=>setTimeout(r,50));
+            document.querySelector('.clock-theme-control').scrollIntoView({behavior:'instant',block:'start'});
+          })()`, awaitPromise:true,
+        });
+        await new Promise(r=>setTimeout(r,500));
+        const bounds = await cdp.send("Runtime.evaluate", {expression:`JSON.stringify((() => { const r=document.querySelector('.clock-theme-control').getBoundingClientRect(); return {x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height,scale:1}; })())`,returnByValue:true});
+        const shot = await cdp.send("Page.captureScreenshot", {format:"png",captureBeyondViewport:true,clip:JSON.parse(bounds.result.result.value)});
+        writeFileSync(join(outDir, `${vp.name}-photo-editor.png`), Buffer.from(shot.result.data,"base64"));
+        console.log(`wrote ${vp.name}-photo-editor.png`);
+        continue;
       }
 
       // Full page.

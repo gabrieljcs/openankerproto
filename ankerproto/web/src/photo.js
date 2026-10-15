@@ -26,3 +26,9 @@ export async function preparePhoto(image, { width, height, format = 'image/jpeg'
   const checksum = crc32(new Uint8Array(await blob.arrayBuffer()));
   return { blob, canvas, crc: checksum, width, height };
 }
+
+/** Convert preview drag distance to normalized crop placement, clamped at edges. */
+export function panPhoto({ x, y, width, height, rect }, dx, dy) {
+  const move = (start, delta, space) => Math.max(0, Math.min(1, Math.abs(space) < 0.01 ? start : start + delta / space));
+  return { x: move(x, dx, width - rect.width), y: move(y, dy, height - rect.height) };
+}

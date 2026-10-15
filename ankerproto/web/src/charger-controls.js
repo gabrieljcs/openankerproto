@@ -92,6 +92,7 @@ export function wireChargerControls({ getSession, getTransport, refresh, syncClo
     const button = $('apply-clock-theme'), result = $('clock-theme-result');
     try {
       const type = Number($('clock-style').value), crcText = $('clock-image-crc').value.trim();
+      if (type === 3 && !$('clock-image-url').value.trim()) throw new Error('Make your photo available to the charger first, or enter a hosted image URL in Advanced.');
       if (type === 3 && !/^[0-9a-fA-F]{8}$/.test(crcText)) throw new Error('Enter the device-ready file’s CRC32 as eight hex digits.');
       if (type === 3 && !$('clock-image-id').value.trim()) throw new Error('Enter a theme ID.');
       button.disabled = true; result.textContent = 'Waiting for the charger…';

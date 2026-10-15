@@ -549,6 +549,27 @@ async function main() {
       checks.push(['photo: image selection prepares a crop and checksum', photo.ready && photo.width === 420 && /^[0-9a-f]{8}$/.test(photo.crc), photo.message]);
       checks.push(['photo: demo prepares URL without network delivery', photo.url.includes('192.0.2.1') && /Demo photo prepared/.test(photo.message), photo.message]);
       checks.push(['clock: explains rest and Always on requirement', /when the screen rests/.test(photo.note) && /Always on/.test(photo.note)]);
+      const editProbe = await demoCdp.send('Runtime.evaluate', {
+        expression: `(async () => {
+          const zoom = document.getElementById('photo-zoom');
+          zoom.value = '2'; zoom.dispatchEvent(new Event('input'));
+          const invalidated = !document.getElementById('clock-image-url').value && !document.getElementById('clock-image-crc').value;
+          for (let i=0;i<50 && document.getElementById('photo-save').disabled;i++) await new Promise(r=>setTimeout(r,50));
+          const zoomLabel = document.getElementById('photo-zoom-value').textContent;
+          const canvas = document.getElementById('photo-preview');
+          const before = canvas.toDataURL();
+          document.getElementById('photo-show-clock').click();
+          const overlayOnly = document.getElementById('photo-clock-overlay').hidden && canvas.toDataURL() === before;
+          document.getElementById('photo-reset').click();
+          await new Promise(r=>setTimeout(r,250));
+          return JSON.stringify({invalidated, zoomLabel, overlayOnly, reset: zoom.value === '1' && document.getElementById('photo-x').value === '50', ready: !document.getElementById('photo-save').disabled});
+        })()`, awaitPromise:true, returnByValue:true,
+      });
+      const edit = JSON.parse(editProbe.result.result.value);
+      checks.push(['photo: changing crop invalidates previously shared download', edit.invalidated]);
+      checks.push(['photo: zoom readout updates and reset restores the crop', edit.zoomLabel === '2.00×' && edit.reset && edit.ready]);
+      checks.push(['photo: clock preview is not baked into saved image', edit.overlayOnly]);
+
       await demoCdp.send("Runtime.evaluate", {
         expression: "document.getElementById('disconnect-btn').click()",
       });

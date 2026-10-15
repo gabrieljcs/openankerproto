@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { crc32, photoRect } from '../src/photo.js';
+import { crc32, photoRect, panPhoto } from '../src/photo.js';
 import { createPhotoServer } from '../scripts/photo-server.mjs';
 
 test('photo checksum uses standard CRC32 and unsigned output', () => {
@@ -32,3 +32,10 @@ test('photo helper restricts uploads, serves exact bytes and expires images', as
     assert.equal((await fetch(base + data.path)).status, 404);
   } finally { await new Promise(resolve => server.close(resolve)); }
 });
+
+ test('dragging photo follows the pointer, clamps edges, and keeps fitted axes stable', () => {
+   const crop = { x: .5, y: .5, width: 400, height: 200, rect: photoRect(100, 200, 400, 200) };
+   assert.deepEqual(panPhoto(crop, 100, 60), { x: .5, y: .4 });
+   assert.equal(panPhoto(crop, 0, 1000).y, 0);
+   assert.equal(panPhoto(crop, 0, -1000).y, 1);
+ });

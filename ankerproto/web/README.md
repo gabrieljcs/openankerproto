@@ -487,7 +487,7 @@ On a physical A2345, brightness at 100%, Intelligent mode (1), forward knob dire
 The clock appears when the screen rests, within its configured schedule. Set a
 screen timeout such as 30 seconds; **Always on prevents the clock from appearing**.
 
-Under Device settings → Clock screensaver, select **Image from URL** to choose a
+Under Device settings → Clock screensaver, select **Your photo** to choose a
 photo, crop/zoom it, preview the result, and prepare a JPEG or PNG with its CRC32.
 Image dimensions and JPEG/PNG compatibility remain unverified on hardware.
 Preparation and saving happen locally in the browser.
@@ -520,3 +520,16 @@ mapping. Sending `America/Sao_Paulo` as `<-03>3` was physically confirmed to fix
 the displayed hour. Other time zones remain unverified on hardware.
 
 The Bluetooth handshake version is labeled separately from main firmware.
+
+### Photo editor workflow
+
+The photo editor supports choosing or dropping a JPEG, PNG, or WebP, dragging the
+preview to reposition, and keyboard-accessible zoom/position sliders. Reset
+restores a centered crop. The optional clock overlay is illustrative and is never
+included in the exported image. Image dimensions, format, and manual URL/checksum
+fields are under Advanced options. Editing a shared crop clears its old download
+details so Apply cannot silently send the previous image.
+
+On GitHub Pages, save the photo and follow the local delivery instructions.
+The local helper only accepts the workspace at localhost:8080 or 127.0.0.1:8080.
+Sharing and applying remain separate actions; demo sharing sends no network request.
